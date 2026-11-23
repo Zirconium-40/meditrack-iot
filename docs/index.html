@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi pastillero MediTrack</title>
+  <meta name="description" content="Panel del pastillero MediTrack IoT: siguiente toma, historial y horarios.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%230B6B53'/><rect x='9' y='13' width='14' height='6' rx='3' fill='%23F2C14E'/></svg>">
+</head>
+<body>
+  <a class="saltar" href="#contenido">Ir al contenido</a>
+
+  <header class="encabezado">
+    <div class="marca">
+      <svg class="marca-icono" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="currentColor"/><rect x="9" y="13" width="14" height="6" rx="3" fill="#F2C14E"/></svg>
+      <span>Mi pastillero</span>
+    </div>
+    <p class="conexion" id="conexion" role="status">Conectando…</p>
+    <div class="letra" role="group" aria-label="Tamaño de la letra">
+      <button type="button" class="boton-letra" data-letra="-1" aria-label="Letra más chica">A−</button>
+      <button type="button" class="boton-letra" data-letra="1" aria-label="Letra más grande">A+</button>
+    </div>
+  </header>
+
+  <nav class="pestanas" aria-label="Secciones">
+    <a href="#hoy" class="pestana" data-vista="hoy">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Hoy
+    </a>
+    <a href="#historial" class="pestana" data-vista="historial">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h10"/></svg>Historial
+    </a>
+    <a href="#horarios" class="pestana" data-vista="horarios">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Horarios
+    </a>
+    <a href="#ayuda" class="pestana" data-vista="ayuda">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/></svg>Ayuda
+    </a>
+  </nav>
+
+  <p class="aviso-demo" id="aviso-demo" hidden>Está viendo datos de ejemplo. El pastillero real no está conectado a esta página.</p>
+
+  <main id="contenido" tabindex="-1">
+    <!-- ============================ HOY ============================ -->
+    <section class="vista" id="vista-hoy" aria-labelledby="titulo-hoy">
+      <h1 id="titulo-hoy" class="oculto">Hoy</h1>
+
+      <div class="alerta-toma" id="alerta-toma" role="alert" hidden>
+        <p class="alerta-titulo">Es hora de tomar su medicina</p>
+        <p id="alerta-detalle">Tome las pastillas del vasito y apriete el botón verde del pastillero.</p>
+      </div>
+
+      <div class="alerta-revision" id="alerta-revision" role="alert" hidden>
+        <p class="alerta-titulo" id="revision-titulo">Revise el pastillero</p>
+        <p id="revision-detalle"></p>
+      </div>
+
+      <div class="principal">
+        <div class="carrusel" id="carrusel" role="img" aria-label="Dibujo del pastillero"></div>
+        <div class="siguiente">
+          <p class="hora-actual" id="hora-actual" aria-live="off">--:--</p>
+          <p class="fecha-actual" id="fecha-actual"></p>
+          <div class="siguiente-toma" id="siguiente-toma">
+            <p class="siguiente-titulo">Siguiente toma</p>
+            <p class="siguiente-hora" id="siguiente-hora">Sin horarios</p>
+            <p class="siguiente-detalle" id="siguiente-detalle">Pida a su cuidador que programe los horarios.</p>
+          </div>
+        </div>
+      </div>
+
+      <ul class="leyenda-carrusel" aria-label="Qué significa cada color del dibujo">
+        <li><span class="muestra muestra-siguiente"></span>La siguiente</li>
+        <li><span class="muestra muestra-cargado"></span>Con pastillas</li>
+        <li><span class="muestra muestra-entregado"></span>Ya entregado</li>
+        <li><span class="muestra muestra-salida"></span>Salida (va vacío)</li>
+      </ul>
+
+      <h2>Cómo está su pastillero</h2>
+      <ul class="estado-lista" id="estado-lista"></ul>
+    </section>
+
+    <!-- ========================= HISTORIAL ========================= -->
+    <section class="vista" id="vista-historial" aria-labelledby="titulo-historial" hidden>
+      <h1 id="titulo-historial">Historial</h1>
+
+      <div class="filtro" role="group" aria-label="Periodo">
+        <button type="button" class="opcion" data-dias="1" aria-pressed="false">Hoy</button>
+        <button type="button" class="opcion" data-dias="7" aria-pressed="true">7 días</button>
+        <button type="button" class="opcion" data-dias="30" aria-pressed="false">30 días</button>
+      </div>
+
+      <div class="resumen" id="resumen" aria-live="polite"></div>
+
+      <div class="grafica" id="grafica-dias"></div>
+
+      <h2>Últimos avisos del pastillero</h2>
+      <ol class="eventos" id="eventos"></ol>
+
+      <h2>Temperatura y humedad de las últimas 24 horas</h2>
+      <p class="nota">Las medicinas se guardan mejor por debajo de 30 °C y con poca humedad.</p>
+      <div class="grafica" id="grafica-temp"></div>
+      <div class="grafica" id="grafica-hum"></div>
+    </section>
+
+    <!-- ========================== HORARIOS ========================= -->
+    <section class="vista" id="vista-horarios" aria-labelledby="titulo-horarios" hidden>
+      <h1 id="titulo-horarios">Horarios</h1>
+      <div id="horarios-actuales"></div>
+      <div id="asistente"></div>
+    </section>
+
+    <!-- ============================ AYUDA ========================== -->
+    <section class="vista ayuda" id="vista-ayuda" aria-labelledby="titulo-ayuda" hidden>
+      <h1 id="titulo-ayuda">Ayuda</h1>
+
+      <p class="emergencia">Si se siente mal, llame a su médico o al <a href="tel:911">911</a>.</p>
+
+      <h2>Qué hace el pastillero</h2>
+      <p>A la hora de cada toma, el pastillero gira y deja caer sus pastillas en el vasito. Suena un pitido y se enciende la luz verde hasta que usted apriete el botón verde.</p>
+
+      <h2>Qué significa cada luz</h2>
+      <dl class="significados">
+        <dt><span class="luz luz-verde" aria-hidden="true"></span>Luz verde parpadeando</dt>
+        <dd>Ya cayeron sus pastillas. Tómelas y apriete el botón verde.</dd>
+        <dt><span class="luz luz-roja" aria-hidden="true"></span>Luz roja parpadeando</dt>
+        <dd>La tapa está abierta. Ciérrela para que el pastillero pueda girar.</dd>
+        <dt><span class="luz luz-roja-fija" aria-hidden="true"></span>Luz roja fija</dt>
+        <dd>Algo necesita revisión, por ejemplo una toma que no se confirmó. Revise el vasito y apriete el botón verde.</dd>
+      </dl>
+
+      <h2>Preguntas frecuentes</h2>
+      <details>
+        <summary>Se me olvidó apretar el botón verde</summary>
+        <p>Después de 10 minutos, el pastillero anota la toma como "sin confirmar" y espera a que alguien revise el vasito. Apriete el botón verde cuando lo haya revisado.</p>
+      </details>
+      <details>
+        <summary>¿Cómo cambio los horarios?</summary>
+        <p>Entre a Horarios. Necesita el PIN del cuidador. Al guardar, el pastillero gira a la posición de carga para que pueda poner las pastillas nuevas.</p>
+      </details>
+      <details>
+        <summary>Se fue el internet</summary>
+        <p>El pastillero sigue entregando sus tomas a la hora. Guarda lo que pasa y lo manda a esta página cuando vuelve el internet.</p>
+      </details>
+      <details>
+        <summary>Se fue la luz</summary>
+        <p>El reloj del pastillero tiene su propia pila y no pierde la hora. Si la luz se fue mientras giraba, se enciende la luz roja para que revise el vasito antes de seguir.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <p>MediTrack IoT, prototipo escolar. No sustituye las indicaciones de su médico.</p>
+  </footer>
+
+  <script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
