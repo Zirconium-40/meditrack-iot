@@ -4,7 +4,7 @@
 export const CONFIG = {
   // Direccion de su API en Render (sin "/" al final).
   // Si la dejan vacia, la pagina muestra datos de ejemplo (modo demo).
-  API_URL: 'https://meditrack-api.onrender.com',
+  API_URL: 'https://meditrack-iot.onrender.com',
 
   // Igual que ID_DISPOSITIVO en config.h y DISPOSITIVOS en Render
   ID_DISPOSITIVO: 'meditrack-demo-01',
